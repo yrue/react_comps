@@ -2,16 +2,15 @@ name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
-  call-setup:
-    uses: ./.github/workflows/setup.yml
   chromaui:
-    needs: call-setup
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Install Dependencies
+        run: npm ci
       #👇 Adds Chromatic as a step in the workflow
       - uses: chromaui/action@v1
         # Options required for Chromatic's GitHub Action
@@ -20,7 +19,6 @@ jobs:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           token: ${{ secrets.GITHUB_TOKEN }}
   gitpages:
-    needs: call-setup
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code

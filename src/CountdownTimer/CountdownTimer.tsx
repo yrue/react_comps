@@ -1,5 +1,4 @@
 import { Fragment, useState, useRef, useEffect, useCallback} from 'react';
-import * as React from "react";
 
 // question:
 // initial value for min, sec?
@@ -16,18 +15,28 @@ import * as React from "react";
 
 const minuteInputName = 'minute'
 const secondInputName = 'second'
-const initialTargetTime = {[minuteInputName]: 0, [secondInputName]: 0};
 const pad = (number: number, width: number, filledText: string) => {
     const numStr = number.toString();
     return numStr.length >= width ? number : new Array(width - numStr.length + 1).join(filledText) + number;
 }
+const timeObjToMs = (timeObj:{minute: number, second: number}) => {
+    const {minute , second} = timeObj;
+    return minute*60*1000 + second*1000;
+}
+
+const timeMsToObj = (timeInMs:number) => {
+    const minute = Math.floor(timeInMs / 60 / 1000);
+    const second = (timeInMs - minute * 60 * 1000) / 1000;
+    return {minute, second}
+}
+const countDownInterval = 1000; // ms, 1sec
+
 function CountdownTimer() {
-    const [time, setTime] = useState({...initialTargetTime});
-    const targetTime = useRef({...initialTargetTime}); // no need to display on UI, in sec
+    const [time, setTime] = useState(0);
+    const targetTime = useRef(0); // no need to display on UI, in sec
     const minRef = useRef<HTMLInputElement>(null);
     const secRef = useRef<HTMLInputElement>(null);
     const [isTimerStarted, setIsTimerStarted] = useState(false);
-    const countDownInterval = 1000; // ms, 1sec
 
     const stopTimer = useCallback(() => {
         setIsTimerStarted(false);
@@ -36,13 +45,10 @@ function CountdownTimer() {
 
     useEffect(() => {
         const countdownTime = () => {
-            const newTime = time[minuteInputName]*60*1000 + time[secondInputName]*1000 - countDownInterval; // ms
-            const newMin = Math.floor((newTime/1000)/60);
-            const newSecond = (newTime - newMin*1000*60) / 1000
-            setTime({[minuteInputName]: newMin, [secondInputName]: newSecond})
-
+            const newTime = time - countDownInterval; // ms
             // terminate if reach targetTime
             if (newTime <= 0) stopTimer()
+            setTime(newTime)
         }
 
         let timeoutId : NodeJS.Timeout;
@@ -55,14 +61,14 @@ function CountdownTimer() {
     }, [isTimerStarted, stopTimer, time]);
 
     const formatTime = () => {
-
-        return `${pad(time[minuteInputName], 2, '0')}:${pad(time[secondInputName], 2, '0')}`
+        const {minute, second} = timeMsToObj(time);
+        return `${pad(minute, 2, '0')}:${pad(second, 2, '0')}`
     };
 
-
-
     const startTimer = () => {
-        setTime(targetTime.current);
+        const minute = minRef.current?.value || '0';
+        const second =secRef.current?.value || '0';
+        setTime(timeObjToMs({minute: parseInt(minute), second: parseInt(second)}));
         setIsTimerStarted(true)
     };
     const toggleTimer = () => {
@@ -83,21 +89,17 @@ function CountdownTimer() {
         }
 
         // change display to 00:00
-        targetTime.current = {...initialTargetTime};
-        setTime({...initialTargetTime})
-    };
-    const handleTargetTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const name = event.target.name as 'minute' | 'second'; // resolve TS7053
-        targetTime.current[name] = parseInt(event.target.value);
+        targetTime.current = 0;
+        setTime(0)
     };
     return (
         <Fragment>
             <label>
-                <input ref={minRef} type="number" onChange={handleTargetTimeChange} name={minuteInputName}/>
+                <input ref={minRef} type="number" name={minuteInputName}/>
                 Minutes
             </label>
             <label>
-                <input ref={secRef} type="number" onChange={handleTargetTimeChange} name={secondInputName}/>
+                <input ref={secRef} type="number" name={secondInputName}/>
                 Seconds
             </label>
 

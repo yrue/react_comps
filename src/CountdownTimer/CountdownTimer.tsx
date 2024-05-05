@@ -12,6 +12,17 @@ import { Fragment, useState, useRef, useEffect, useCallback} from 'react';
 // click resume -> continue timer
 // update current timer in sec
 
+// input validation (min/sec in the form validation)
+//      must be numeric (native HTML element validation)
+
+// Enable/Disable
+//  when start, should be disabled, enable again when time is up or reset
+//  when time is up or reset, disable pause/resume and reset, enable when timer is running
+
+// responsive layout
+
+// accessibility
+
 
 const minuteInputName = 'minute'
 const secondInputName = 'second'

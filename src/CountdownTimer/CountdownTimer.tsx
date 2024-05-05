@@ -19,6 +19,7 @@ const pad = (number: number, width: number, filledText: string) => {
     const numStr = number.toString();
     return numStr.length >= width ? number : new Array(width - numStr.length + 1).join(filledText) + number;
 }
+
 const timeObjToMs = (timeObj:{minute: number, second: number}) => {
     const {minute , second} = timeObj;
     return minute*60*1000 + second*1000;
@@ -32,7 +33,10 @@ const timeMsToObj = (timeInMs:number) => {
 const countDownInterval = 1000; // ms, 1sec
 
 function CountdownTimer() {
+    // could this have better name, like 'remainingTime'?
     const [time, setTime] = useState(0);
+    // But when we clicking on Reset, it clear out the values rendered in x min and y sec, shouldn't this be the state value specified on the two inputs in full control way?
+    // What's the usage of this?
     const targetTime = useRef(0); // no need to display on UI, in sec
     const minRef = useRef<HTMLInputElement>(null);
     const secRef = useRef<HTMLInputElement>(null);
@@ -40,24 +44,35 @@ function CountdownTimer() {
 
     const stopTimer = useCallback(() => {
         setIsTimerStarted(false);
+        // why do we want to keep an aditional ``targetTime` when we already have `time` which is the remaining time?
         targetTime.current = time;
     }, [setIsTimerStarted, time])
 
     useEffect(() => {
         const countdownTime = () => {
+            // when it's counting down, click "Reset" and it still make the timer one second less -> -1:59. We should stop deducting the time here when the timer flag is already false
             const newTime = time - countDownInterval; // ms
             // terminate if reach targetTime
             if (newTime <= 0) stopTimer()
             setTime(newTime)
+        
+            // you don't need to remember the `time`, instead:
+            setTime((currentTime) => currentTime - countDownInterval)
         }
 
         let timeoutId : NodeJS.Timeout;
+        // let intervalId: NodeJS.Timeout;
         if (isTimerStarted){
              timeoutId = setTimeout(countdownTime, countDownInterval)
+
+             // alternatively
+            //  intervalId = setInterval(countdownTime, countDownInterval);
         }
         else
             stopTimer();
         return () => clearTimeout(timeoutId)
+        // return () => clearImmediate(intervalId);
+        // return () => clearTimeout(
     }, [isTimerStarted, stopTimer, time]);
 
     const formatTime = () => {
@@ -81,9 +96,12 @@ function CountdownTimer() {
     const handleReset = () => {
         // reset min, sec to 0
         // resolve TS18047 with null checker
+
+        // you don't need to check if it exists
         if (minRef.current) {
             minRef.current.value = '';
         }
+        // you don't need to check if it exists
         if (secRef.current) {
             secRef.current.value = '';
         }

@@ -1,4 +1,4 @@
-import { Fragment, useState, useRef, useEffect, useCallback} from 'react';
+import { Fragment, useState, useEffect, useCallback} from 'react';
 
 // question:
 // initial value for min, sec?
@@ -11,7 +11,6 @@ import { Fragment, useState, useRef, useEffect, useCallback} from 'react';
 // click pause -> stop timer
 // click resume -> continue timer
 // update current timer in sec
-
 
 const minuteInputName = 'minute'
 const secondInputName = 'second'
@@ -30,76 +29,91 @@ const timeMsToObj = (timeInMs:number) => {
     return {minute, second}
 }
 const countDownInterval = 1000; // ms, 1sec
-
+enum TimeInput {
+    MINUTE= 'minute',
+    SECOND= 'second'
+}
+const initialTargetTime = {[TimeInput.MINUTE]: 0, [TimeInput.SECOND]: 0};
 function CountdownTimer() {
-    const [time, setTime] = useState(0);
-    const targetTime = useRef(0); // no need to display on UI, in sec
-    const minRef = useRef<HTMLInputElement>(null);
-    const secRef = useRef<HTMLInputElement>(null);
+    const [remainingTime, setRemainingTime] = useState(0);
     const [isTimerStarted, setIsTimerStarted] = useState(false);
+    const [targetTime, setTargetTime] = useState(initialTargetTime);
 
     const stopTimer = useCallback(() => {
         setIsTimerStarted(false);
-        targetTime.current = time;
-    }, [setIsTimerStarted, time])
+    }, [setIsTimerStarted])
 
     useEffect(() => {
         const countdownTime = () => {
-            const newTime = time - countDownInterval; // ms
-            // terminate if reach targetTime
-            if (newTime <= 0) stopTimer()
-            setTime(newTime)
+            setRemainingTime(prev => {
+                const newTime = prev - countDownInterval;
+                // terminate if reach targetTime
+                if (newTime <= 0) stopTimer()
+                return newTime
+            })
         }
 
-        let timeoutId : NodeJS.Timeout;
-        if (isTimerStarted){
-             timeoutId = setTimeout(countdownTime, countDownInterval)
-        }
+        /**
+         * Alternatively
+         */
+        // let timeoutId : NodeJS.Timeout;
+        // if (isTimerStarted){
+        //      timeoutId = setTimeout(countdownTime, countDownInterval)
+        // }
+        // else
+        //     stopTimer();
+        // return () => clearTimeout(timeoutId)
+
+        let intervalId: NodeJS.Timeout;
+        if (isTimerStarted)
+            intervalId = setInterval(countdownTime, countDownInterval);
         else
-            stopTimer();
-        return () => clearTimeout(timeoutId)
-    }, [isTimerStarted, stopTimer, time]);
+            stopTimer()
+        return () => clearInterval(intervalId)
+    }, [isTimerStarted, stopTimer]);
 
     const formatTime = () => {
-        const {minute, second} = timeMsToObj(time);
+        const {minute, second} = timeMsToObj(remainingTime);
         return `${pad(minute, 2, '0')}:${pad(second, 2, '0')}`
     };
 
     const startTimer = () => {
-        const minute = minRef.current?.value || '0';
-        const second =secRef.current?.value || '0';
-        setTime(timeObjToMs({minute: parseInt(minute), second: parseInt(second)}));
+        
+        const minute = targetTime[TimeInput.MINUTE];
+        const second =targetTime[TimeInput.SECOND];
+        if (minute === 0 && second === 0) return; // do nothing if no value set
+        setRemainingTime(timeObjToMs({minute, second}));
         setIsTimerStarted(true)
     };
+    const resumeTimer = () => {
+        if (remainingTime === 0) return; // do nothing if remaining time is 0
+        setIsTimerStarted(true)
+    }
     const toggleTimer = () => {
         if (isTimerStarted) {
             stopTimer()
         } else {
-            startTimer()
+            resumeTimer()
         }
     };
     const handleReset = () => {
         // reset min, sec to 0
-        // resolve TS18047 with null checker
-        if (minRef.current) {
-            minRef.current.value = '';
-        }
-        if (secRef.current) {
-            secRef.current.value = '';
-        }
-
+        setTargetTime(initialTargetTime)
         // change display to 00:00
-        targetTime.current = 0;
-        setTime(0)
+        setRemainingTime(0)
     };
+    const handleTimeChange = (e: { target: { name: keyof TimeInput; value: string; }; }) => {
+        const {name, value} = e.target
+        setTargetTime(prev => ({...prev, [name]: parseInt(value)}))
+    }
     return (
         <Fragment>
             <label>
-                <input ref={minRef} type="number" name={minuteInputName}/>
+                <input type="number" name={minuteInputName} value={targetTime[TimeInput.MINUTE] || ''} onChange={handleTimeChange}/>
                 Minutes
             </label>
             <label>
-                <input ref={secRef} type="number" name={secondInputName}/>
+                <input type="number" name={secondInputName} value={targetTime[TimeInput.SECOND] || ''} onChange={handleTimeChange}/>
                 Seconds
             </label>
 

@@ -1,4 +1,4 @@
-// input: ComponentName Path
+// input: Path ComponentName includeCss
 // effect: generate index.ts, {ComponentName}.ts
 // 1. index.ts includes export {ComponentName}.ts
 // 2. Component includes initial component names with {ComponentName}
@@ -11,8 +11,8 @@ import path from "path";
 // Read command-line arguments
 // eslint-disable-next-line no-undef
 const args = process.argv.slice(2);
-const componentNames = args.at(0)?.split(",");
-const targetPath = args.at(1);
+const targetPath = args.at(0);
+const componentNames = args.at(1)?.split(",");
 const includeCss = Boolean(args.at(2));
 console.log({includeCss});
 

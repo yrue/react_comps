@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 
-const getStories = async () => {
-  const result = await fetch('https://hacker-news.firebaseio.com/v0/jobstories.json')
-  if (result.status === 200) {
-    return result.body
-  }
-}
+// TODO:
+// Improvement
+// on load button click -> call API to fetch event based on current job size + 1
+// so that no need `page` state and useEffect
 
 interface Job {
   id: string, title: string, time: string, by: string, url?: string

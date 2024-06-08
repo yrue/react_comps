@@ -1,47 +1,61 @@
 import { ChangeEvent, useState } from 'react';
 import './TodoList.module.css';
 
-const defaultTodoList: string[] = [
-  'Walk the dog',
-  'Water the plants',
-  'Wash the dishes'
-]
+let id = 0;
+
+interface Task{
+    id: number,
+    label: string
+}
+const INITIAL_TASKS: Task[] = [
+  { id: id++, label: 'Walk the dog' },
+  { id: id++, label: 'Water the plants' },
+  { id: id++, label: 'Wash the dishes' },
+];
 const TodoList = () => {
-    const [todoList, setTodo] = useState<string[]>(defaultTodoList)
-    const [newItem, setNewItem] = useState<string>('');
-  
-    const handleDeletion = (index: number) => {
-      setTodo(prev => {
-        const copy = [...prev]
-        copy.splice(index, 1)
-        return copy
-      })
-    }
-    const handleAdd = () => {
-      setTodo(prev => {
-        return [...prev, newItem]
-      })
-      setNewItem('')
-    }
-  
-    const handleNewTaskChange = (e: ChangeEvent<HTMLInputElement>) => {
-      setNewItem(e.target.value)
-    }
+    const [tasks, setTasks] = useState(INITIAL_TASKS);
+    const [newTask, setNewTask] = useState('');
   
     return (
       <div>
         <h1>Todo List</h1>
         <div>
-          <input type="text" placeholder="Add your task" value={newItem} onChange={handleNewTaskChange} />
+          <input
+            aria-label="Add new task"
+            type="text"
+            placeholder="Add your task"
+            value={newTask}
+            onChange={(event) => {
+              setNewTask(event.target.value);
+            }}
+          />
           <div>
-            <button onClick={handleAdd} >Submit</button>
+            <button
+              onClick={() => {
+                setTasks(
+                  tasks.concat({
+                    id: id++,
+                    label: newTask.trim(),
+                  }),
+                );
+                setNewTask('');
+              }}>
+              Submit
+            </button>
           </div>
         </div>
         <ul>
-          {todoList.map((todo, index) => (
-            <li key={todo}>
-              <span>{todo}</span>
-              <button onClick={() => handleDeletion(index)}>Delete</button>
+          {tasks.map(({ id, label }) => (
+            <li key={id}>
+              <span>{label}</span>
+              <button
+                onClick={() => {
+                  setTasks(
+                    tasks.filter((task) => task.id !== id),
+                  );
+                }}>
+                Delete
+              </button>
             </li>
           ))}
         </ul>

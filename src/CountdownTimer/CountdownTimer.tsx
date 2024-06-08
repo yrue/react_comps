@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect, useCallback} from 'react';
+import { Fragment, useState, useEffect, useCallback, ChangeEvent} from 'react';
 
 // question:
 // initial value for min, sec?
@@ -102,7 +102,7 @@ function CountdownTimer() {
         // change display to 00:00
         setRemainingTime(0)
     };
-    const handleTimeChange = (e: { target: { name: keyof TimeInput; value: string; }; }) => {
+    const handleTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target
         setTargetTime(prev => ({...prev, [name]: parseInt(value)}))
     }

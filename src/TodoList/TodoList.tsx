@@ -1,17 +1,14 @@
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 import './TodoList.module.css';
 
 let id = 0;
 
-interface Task{
-    id: number,
-    label: string
-}
-const INITIAL_TASKS: Task[] = [
-  { id: id++, label: 'Walk the dog' },
-  { id: id++, label: 'Water the plants' },
-  { id: id++, label: 'Wash the dishes' },
-];
+// The reason for not using object of [id]: {label: string} is that there's only one property for now, so we don't need to specify it.
+const INITIAL_TASKS: Record<number, string> = {
+  [id++]:  'Walk the dog' ,
+  [id++]:  'Water the plants' ,
+  [id++]:  'Wash the dishes' ,
+};
 const TodoList = () => {
     const [tasks, setTasks] = useState(INITIAL_TASKS);
     const [newTask, setNewTask] = useState('');
@@ -33,10 +30,9 @@ const TodoList = () => {
             <button
               onClick={() => {
                 setTasks(
-                  tasks.concat({
-                    id: id++,
-                    label: newTask.trim(),
-                  }),
+                  prev => {
+                    return {...prev, [id++]: newTask}
+                  }
                 );
                 setNewTask('');
               }}>
@@ -45,13 +41,17 @@ const TodoList = () => {
           </div>
         </div>
         <ul>
-          {tasks.map(({ id, label }) => (
+          {Object.entries(tasks).map(([id, label]) => (
             <li key={id}>
               <span>{label}</span>
               <button
                 onClick={() => {
                   setTasks(
-                    tasks.filter((task) => task.id !== id),
+                    prev => {
+                        const copy = {...prev}
+                        delete copy[id]
+                        return copy
+                    }
                   );
                 }}>
                 Delete

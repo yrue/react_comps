@@ -9,7 +9,7 @@ import { useState } from 'react';
 const TemperatureConverter = () => {
     const [celsiusValue, setCelsiusValue] = useState<string>('');
     const [fahrenheitValue, setFahrenheitValue] = useState<string>('');
-    // [Question]: merge onChange into a single handler? GFE approach extract convert()
+    // [Question]: merge onChange into a single handler? GFE approach extract convert() -> depends
 
     const format = (number: number|null): string => {
         if (!number) return '';
@@ -21,7 +21,7 @@ const TemperatureConverter = () => {
     }
 
     const isValid = (value: string): boolean => {
-        return !isNaN(Number(value)) // [Question]: GFE includes a Boolean() check, why?
+        return !isNaN(Number(value)) && value.length > 0
     }
 
     return (

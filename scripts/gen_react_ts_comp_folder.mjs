@@ -86,7 +86,7 @@ export default ${componentName};
       componentFolderPath,
       `${componentName}.stories.${extension}x`
     ),
-    content: `import ${componentName} from "./${componentName}.tsx";
+    content: `import ${componentName} from ".";
 
 export default {
     component: ${componentName}

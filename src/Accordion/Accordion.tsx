@@ -12,6 +12,11 @@ const Accordion = ({title, content}: AccordionProps) => {
         <button aria-label={title} onClick={() => setIsVisible(prev => !prev)}>
             {title}
         </button>
+        {/* 
+        Approach - use state to toggle (vs use style: display)
+        pros - won't large mounted dom node when initializing (better approach: with style), 
+        cons - remount effort which harms perf in larger scale 
+        */}
         {isVisible && <div aria-label={title} role='region'>{content}</div>}
         </>
     );

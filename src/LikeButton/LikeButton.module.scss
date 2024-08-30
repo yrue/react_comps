@@ -1,0 +1,22 @@
+$gray: #888;
+$red: #f00;
+
+.btn{
+  border : 0.25rem solid $gray;
+  color: $gray;
+  font-weight: bold;
+  border-radius: 2rem;
+  display: flex;
+  gap: 0.5rem;
+
+  &.liked {
+    border-color: #f00;
+    background: $red;
+    color: white;
+  }
+  &.hover {
+    border-color: $red;
+    color: red;
+    background: none;
+  }
+}

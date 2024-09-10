@@ -20,7 +20,7 @@ console.log({includeCss});
   if (args.length < 2) {
     console.error("Error: Not enough arguments provided.");
     console.error(
-      "Usage: node script.js <componentNames> <targetPath> [includeCss]"
+      "Usage: node script.js <targetPath> <componentNames> [includeCss(default: false)]"
     );
     process.exit(1);
   }

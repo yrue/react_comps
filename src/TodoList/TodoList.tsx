@@ -1,65 +1,57 @@
-import { useState } from 'react';
-import './TodoList.module.css';
-
-let id = 0;
-
-// The reason for not using object of [id]: {label: string} is that there's only one property for now, so we don't need to specify it.
-const INITIAL_TASKS: Record<number, string> = {
-  [id++]:  'Walk the dog' ,
-  [id++]:  'Water the plants' ,
-  [id++]:  'Wash the dishes' ,
-};
+import {useState} from 'react';
+interface Todo {
+    id: number,
+    content: string
+}
+let id = 0
+const getId = () => {
+    id += 1;
+    return id
+}
+const defaultTodos : Todo[] = [
+    {
+        id: getId(),
+        content: 'Walk the dog'
+    },
+    {
+        id: getId(),
+        content: 'Water the plants'
+    },
+    {
+        id: getId(),
+        content: 'Wash the dishes'
+    }
+]
 const TodoList = () => {
-    const [tasks, setTasks] = useState(INITIAL_TASKS);
-    const [newTask, setNewTask] = useState('');
-  
+    const [todos, setTodos] = useState<Todo[]>(defaultTodos)
+    const [newTodo, setNewTodo] = useState<string>('');
     return (
-      <div>
-        <h1>Todo List</h1>
-        <div>
-          <input
-            aria-label="Add new task"
-            type="text"
-            placeholder="Add your task"
-            value={newTask}
-            onChange={(event) => {
-              setNewTask(event.target.value);
-            }}
-          />
-          <div>
-            <button
-              onClick={() => {
-                setTasks(
-                  prev => {
-                    return {...prev, [id++]: newTask}
-                  }
-                );
-                setNewTask('');
-              }}>
-              Submit
-            </button>
-          </div>
-        </div>
-        <ul>
-          {Object.entries(tasks).map(([id, label]) => (
-            <li key={id}>
-              <span>{label}</span>
-              <button
-                onClick={() => {
-                  setTasks(
-                    prev => {
-                        const copy = {...prev}
-                        delete copy[id]
-                        return copy
-                    }
-                  );
-                }}>
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+        <>
+            <h1>Todo List</h1>
+            <form onSubmit={(e) => {
+                e.preventDefault();
+                const formItem = new FormData(e.currentTarget);
+                const newTodo = formItem.get('todo') as string; // TODO: other approach than `as string`?
+
+                setTodos([...todos, {id: getId(), content: newTodo}]);
+                setNewTodo('');
+            }}>
+                <input placeholder='Add your task' name='todo' value={newTodo} onChange={(e) => setNewTodo(e.target.value)}/>
+                <button type='submit' disabled={!newTodo}>Submit</button>
+            </form>
+            {todos.length > 0 &&(
+                <ul>
+                    {todos.map(({id, content}) => (
+                        <>
+                            <li key={id}>{content}</li>
+                            <button onClick={() => {
+                                setTodos([...todos.filter(todo => todo.id !== id)])
+                            }}>Delete</button>
+                        </>
+                    ))}
+                </ul>
+            )}
+        </>
     );
 };
 

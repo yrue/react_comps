@@ -1,4 +1,4 @@
-import TodoList from "./TodoList.tsx";
+import TodoList from ".";
 
 export default {
     component: TodoList

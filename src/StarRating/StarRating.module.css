@@ -1,0 +1,15 @@
+.container{
+  display: inline;
+}
+
+.icon {
+  --icon-size: 32px;
+
+  cursor: pointer;
+  height: var(--icon-size);
+  width: var(--icon-size);
+}
+
+.filled {
+  fill: yellow;
+}

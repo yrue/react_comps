@@ -39,24 +39,24 @@ const Star = ({className}: StarProps) => {
 }
 
 interface StarRatingProps {
-    maxStars: number,
-    filledStars: number
+    max: number,
+    filledCount: number,
+    onChange: (filledStar: number) => void
 }
-const StarRating = ({ maxStars, filledStars: initFilledStar }: StarRatingProps) => {
-    const [filledStars, setFilledStars] = useState<number>(initFilledStar);
+const StarRating = ({ max, filledCount, onChange }: StarRatingProps) => {
     const [hoveredStars, setHoveredStars] = useState<number>();
     return (
-        Array.from({ length: maxStars }).map((_, index) => {
-            const finalFilledStars = hoveredStars || filledStars;
+        Array.from({ length: max }).map((_, index) => {
+            const finalFilledStars = hoveredStars || filledCount;
             return (
                 <div
                     key={index}
                     className={styles.container}
-                    onClick={() => setFilledStars(index)}
+                    onClick={() => onChange(index + 1)}
                     onMouseOver={() => setHoveredStars(index + 1)}
                     onMouseLeave={() => {
                         setHoveredStars(0);
-                        setFilledStars(filledStars)
+                        onChange(filledCount)
                     }}
                     >
                     <Star className={index < finalFilledStars ? styles.filled : ''} />

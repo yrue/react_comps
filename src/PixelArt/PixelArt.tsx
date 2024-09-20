@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import styles from './PixelArt.module.css';
-import Cell from './Cell';
-import { mocked } from '@storybook/test';
 
 /**
  * UI
@@ -76,22 +74,25 @@ const PixelArt = () => {
         <div className={styles.container}>
             {/* TODO: new comp */}
             <div className={styles.canvas}>
-                {Array.from({ length: CANVAS.WIDTH * CANVAS.HEIGHT }, () => null).map((_, index) => (
-                    <div className={styles.grid} style={{ background: cellColors[index] }}
-                        onMouseDown={() => setIsDragging(true)}
-                        onMouseUp={() => setIsDragging(false)}
-                        onMouseOver={() => {
-                            if (!isDragging) return;
-
-                            if (mode === Mode.Draw) setCellColors({ ...cellColors, [index]: selectedColor });
-                            if (mode === Mode.Erase) {
-                                const newCellColors = {...cellColors}
-                                delete newCellColors[index]
-                                setCellColors({ ...newCellColors })
-                            };
-                        }}
-                    ></div>
-                ))}
+                {Array.from({ length: CANVAS.WIDTH * CANVAS.HEIGHT }, () => null).map((_, index) => {
+                    const handleMark = () => {
+                        if (mode === Mode.Draw) setCellColors({ ...cellColors, [index]: selectedColor });
+                        if (mode === Mode.Erase) {
+                            const newCellColors = {...cellColors}
+                            delete newCellColors[index]
+                            setCellColors({ ...newCellColors })
+                        }
+                    }
+                    return (
+                        <div className={styles.grid} style={{ background: cellColors[index] }}
+                            onMouseDown={() => setIsDragging(true)}
+                            onMouseUp={() => setIsDragging(false)}
+                            // Click to draw or erase 
+                            onClick={handleMark} 
+                            onMouseOver={() => isDragging ? handleMark() : null}
+                        ></div>
+                    )
+                })}
             </div>
 
             {/* TODO: new comp */}
@@ -105,6 +106,7 @@ const PixelArt = () => {
                 <div className={styles.colorPicker}>
                     {Object.entries(COLORS).map(([color, hashCode]) => {
                         const className = [styles.cell]
+                        if (color === 'white') className.push(styles.border)
                         if (selectedColor === hashCode) className.push(styles.activeColor)
                         return (
                             <div className={className.join(' ')} style={{ background: hashCode }} aria-label={color}

@@ -54,7 +54,10 @@
   width: 20px;
   height: 20px;
   cursor: pointer;
-  border: 1px lightgray solid;
+}
+
+.border{
+  border: 2px lightgray solid;
 }
 
 .activeColor {

@@ -54,7 +54,7 @@ const Wordle = ({ word }: WordleProps) => {
         // index, letter correct -> correct
         if (word[index] === letter) return STATUS_COLOR.CORRECT;
         // letter correct -> present
-        if (wordSet.has(letter)) return STATUS_COLOR.PRESENT;
+        if (wordSet.has(letter)) return STATUS_COLOR.PRESENT; // TODO: frequency of the letter in the word should be considered
         // input but not in word -> gray
         return STATUS_COLOR.ABSENT
     }

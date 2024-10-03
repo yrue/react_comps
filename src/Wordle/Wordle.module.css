@@ -27,6 +27,12 @@
   /* Fixed size no matter whether there's content or not */
   height: 4rem;
   width: 4rem;
+
+  /* align text */
+  align-content: center; /* vertical */
+  text-align: center; /* horizontal */
+
+  font-size: 2rem;
 }
 
 .keyboard{

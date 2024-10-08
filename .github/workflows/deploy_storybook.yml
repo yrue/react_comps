@@ -25,8 +25,12 @@ jobs:
           STORYBOOK_URL="${{ steps.chromatic.outputs.storybookUrl }}"
           echo "Updating GitHub About section with Storybook URL: $STORYBOOK_URL"
           
+          GITHUB_API="https://api.github.com/repos/${{github.repository_owner}}${{ github.repository }}"
+          echo "GITHUB_API: $GITHUB_API"
+
           # Update the repository about link
-          curl -X PATCH "https://api.github.com/repos/${{ github.repository }}" \
+          curl -X PATCH $GITHUB_API \
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           -H "Accept: application/vnd.github.v3+json" \
           -d "{\"description\": \"Latest Storybook: $STORYBOOK_URL\"}"
+          -d '{"homepage": "[Demo Page]($STORYBOOK_URL)"}'

@@ -4,33 +4,39 @@ import * as FileExplorerStories from './FileExplorer.stories';
  
 <Meta of={FileExplorerStories} />
  
-# FileExplorer 
+# FileExplorer
+
 ## Features
-- Display files and directories in a hierarchical Tree format
-## Retrictiion
-- ID and names within the same directory are unique
-## Focus of this component
-- Functionality instead of styling
-## Test cases
-- Display in hierarchical Tree forat
-- Display names of files and directories
-- Content of direction is intended to the right.
-- Click Dictionary can toggle its expanded and collapsed state.
-- Directories should appear before files
-- All items should be sorted within their respective categories
-- (optional) Style expended or collapsed state.
-- Empty directory can be rendered without placeholder.
-- File cannot be interacted with.
-## Data format
-```
+- **Hierarchical Display:** Presents files and directories in a structured tree format.
+
+## Restrictions
+- **Unique Identifiers:** Each file and directory within the same parent directory must have a unique `id` and `name`.
+
+## Component Focus
+- **Functionality Over Styling:** Prioritizes core functionality, ensuring robust behavior before applying styles.
+
+## Test Cases
+- **Hierarchical Rendering:** Ensures files and directories are displayed in a hierarchical tree structure.
+- **Name Display:** Verifies that the names of files and directories are rendered correctly.
+- **Indentation:** Confirms that the contents of directories are indented to the right.
+- **Toggle Functionality:** Allows directories to be clicked to expand or collapse their contents.
+- **Directory Prioritization:** Ensures that directories are listed before files within the same parent.
+- **Alphabetical Sorting:** Sorts all items alphabetically within their respective categories (directories and files).
+- **Optional Styling:** Applies distinct styles to expanded or collapsed states.
+- **Empty Directories:** Renders empty directories without placeholders.
+- **Non-Interactive Files:** Ensures that files are non-interactive and do not respond to click events.
+
+## Data Format
+```typescript
 interface FileObject {
   id: number;
   name: string;
   children?: FileObject[];
 }
 ```
-Example data:
-```
+
+**Example Data:**
+```typescript
 const fileData = [
   {
     id: 1,
@@ -52,33 +58,42 @@ const fileData = [
   },
 ];
 ```
+
 ## Flow
-iterate data -> directory or file
-## Work items
-- ✅ determine if an object is a directiory or file by checking whether there's any extension. Cannot use whether there's a children property. Although extention might work in some cases, but it is likely to have false positive because there's no limitation of the directories.
-- sort content by categories(dir -> file) first then alphabetically
-- ✅ basic rendering
-- ✅ click directories to toggle content
-- add css
-## Component structure
+1. **Data Iteration:** Traverse the `fileData` to identify each item as either a directory or a file.
+2. **Rendering:** Render each item accordingly, maintaining the hierarchical structure.
+
+## Decision
+- **Nested Rendering:** Choose nested rendering over flat rendering due to the small size of the dataset and the intuitive nature of this approach.
+
+## Work Items
+- ✅ **Determine Item Type:** Identify whether an object is a directory or a file by checking for a file extension. Avoid relying solely on the presence of the `children` property, as some directories might not follow naming conventions.
+- ✅ **Sort Content:** Organize items by categories (directories first, then files) and sort them alphabetically within each category.
+- ✅ **Basic Rendering:** Implement the fundamental rendering logic for displaying the hierarchical structure.
+- ✅ **Toggle Directories:** Enable clicking on directories to expand or collapse their contents.
+
+## Component Structure
+```
 FileExplorer
-  Directory
-    Directory
-    File
-## State/Props
-*FileExplorer*
-prop
-data: FileObject[]
+├── Directory
+│   ├── Directory
+│   └── File
+```
 
-*Directory*
-prop
-name
-id
+## State and Props
 
-state
-is open
+### **FileExplorer**
+- **Props:**
+  - `data: FileObject[]` – The array of file and directory objects to display.
 
-*File*
-prop
-name
-id
+### **Directory**
+- **Props:**
+  - `name: string` – The name of the directory.
+  - `id: number` – The unique identifier of the directory.
+- **State:**
+  - `isOpen: boolean` – Indicates whether the directory is expanded (`true`) or collapsed (`false`).
+
+### **File**
+- **Props:**
+  - `name: string` – The name of the file.
+  - `id: number` – The unique identifier of the file.

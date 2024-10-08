@@ -1,5 +1,4 @@
-import React, { Fragment, ReactNode, useState } from 'react';
-import styles from './FileExplorer.module.css';
+import { useState } from 'react';
 
 interface FileObject {
     id: number;
@@ -7,48 +6,46 @@ interface FileObject {
     children?: FileObject[];
 }
 
-enum ObjectType {
-    File,
-    Directory
-}
-
 interface FileExplorerProps {
     data: FileObject[]
 }
 
-// TODO: pick 2 of 3 prop from File obj as FileProp type
-interface FileProp{
-    name: string
-}
-const File = ({ name }: FileProp) => {
-    return (<div>{name}</div>)
+const FileList = ({ data }: { data: FileObject[] }) => {
+    // sort by category first then alphabetically
+    const directories = data.filter(({ children }) => children);
+    const files = data.filter(({ children }) => !children);
+    directories.sort((a, b) => a.name.localeCompare(b.name));
+    files.sort((a, b) => a.name.localeCompare(b.name));
+
+    return data.map(obj => <FileObject {...obj} />)
 }
 
-interface DirectoryProp {
-    name: string
-    children: ReactNode
-}
-const Directory = ({ name, children }: DirectoryProp) => {
-    const [isOpen, setIsOpen] = useState(true);
+const FileObject = ({ name, children }: FileObject) => {
+    const [isOpen, setIsOpen] = useState<boolean>(true);
     return (
-        <div>
-            <div style={{color: 'red'}} onClick={() => setIsOpen(!isOpen)}>{name} [{isOpen ? '-' : '+'}]</div>
-            {isOpen && <div style={{position: 'relative', left: '1rem'}}>{children}</div>}
-        </div>)
+        <li>
+            <div
+                onClick={() => {
+                    if (!children) return
+                    setIsOpen(!isOpen);
+                }}
+            >
+                {name}
+                {children && (
+                    `[${isOpen ? '-' : '+'}]`
+                )}
+            </div>
+            {(isOpen && children) && <FileExplorer data={children} />}
+        </li>
+    )
 }
-const FileExplorer = ({ data }: FileExplorerProps) => {
-    // TODO sort by category first then alphabetically
 
-    return data.map(obj => {
-        return (
-        <Fragment key={obj.id}>
-            {obj.children ? (
-                <Directory {...obj}><FileExplorer data={obj.children} /></Directory>
-            ) : (
-                <File {...obj} />
-            )}
-        </Fragment>)
-    })
+const FileExplorer = ({ data }: FileExplorerProps) => {
+    return (
+        <ul>
+            <FileList data={data} />
+        </ul>
+    )
 };
 
 

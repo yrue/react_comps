@@ -14,7 +14,7 @@ const args = process.argv.slice(2);
 const targetPath = args.at(0);
 const componentNames = args.at(1)?.split(",");
 const includeCss = Boolean(args.at(2));
-console.log({includeCss});
+console.log({ includeCss });
 
 (function inputVerification() {
   if (args.length < 2) {
@@ -59,7 +59,7 @@ componentNames.forEach((componentName) => {
   if (includeCss === true) {
     const cssPath = path.join(
       componentFolderPath,
-      `${componentName}.module.css`
+      `${componentName}.module.scss`
     );
     const cssContent = `.container{\n\n}`;
     fs.writeFileSync(cssPath, cssContent);
@@ -96,6 +96,20 @@ export const Default = {
 }`,
   };
   fs.writeFileSync(storybook.path, storybook.content);
+
+  // Create MDX file
+  const storyCompName = `${componentName}Stories`;
+  const mdx = {
+    path: path.join(componentFolderPath, `${componentName}.mdx`),
+    content: `import { Meta } from '@storybook/blocks';
+ 
+import * as ${storyCompName} from './${componentName}.stories';
+ 
+<Meta of={${storyCompName}} />
+ 
+# ${componentName} `,
+  };
+  fs.writeFileSync(mdx.path, mdx.content);
 
   console.log(
     `Component ${componentName} created successfully at ${componentFolderPath}`

@@ -17,7 +17,7 @@ const FileList = ({ data }: { data: FileObject[] }) => {
     directories.sort((a, b) => a.name.localeCompare(b.name));
     files.sort((a, b) => a.name.localeCompare(b.name));
 
-    return data.map(obj => <FileObject {...obj} />)
+    return <div style={{paddingLeft: '1rem'}}>{[...directories, ...files].map(obj => <FileObject {...obj} />)}</div>
 }
 
 const FileObject = ({ name, children }: FileObject) => {
@@ -35,7 +35,7 @@ const FileObject = ({ name, children }: FileObject) => {
                     `[${isOpen ? '-' : '+'}]`
                 )}
             </div>
-            {(isOpen && children) && <FileExplorer data={children} />}
+            {(isOpen && children) && <FileList data={children} />}
         </li>
     )
 }

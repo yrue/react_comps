@@ -1,0 +1,56 @@
+import { Meta } from '@storybook/blocks';
+ 
+import * as DropdownStories from './Dropdown.stories';
+ 
+<Meta of={DropdownStories} />
+ 
+# Dropdown 
+ 
+## Requirements
+### Main Features:
+
+UI
+1. Trigger button labelled with selected text, default is 'No selected'
+2. Menu
+
+Interaction
+1. Click the dropdown button then show the Menu
+2. Click on any of the item, show as button text and close the menu
+3. Only show 7 of 100 items in the menu and allow to scroll
+
+### Nice to Have features
+- customization style
+- Render - customized position(css: position), auto change position when reaching boundary(offset, retangleBoundary()), avoid covered by parents(React Portal)
+- Accessibility - label, close menu when click outside of the menu, keyboard Interaction
+- Performance - menu items count is large -> virtual window
+- Globalization - RTL content
+
+## High Level Architecture
+### UI
+```
+Container - ?div
+  Button - button
+  Menu - div
+    Item - button
+```
+
+### Data Model
+State
+- isOpen: boolean
+
+  true - show menu
+  
+  false - hide menu (default)
+
+- selected item: string
+
+  '' (default)
+
+  \<string of selected item>
+
+Prop
+- Dropdown (container)
+  initialSelectedItem?: string
+  label: string
+  className: string
+  items: string[]

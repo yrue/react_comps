@@ -10,7 +10,7 @@ export interface DropdownProps {
     initialSelectedItem?: string
     label?: string
     className?: string
-    items: string[]
+    items?: string[]
     position?: Position
 }
 

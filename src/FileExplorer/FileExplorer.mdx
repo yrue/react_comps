@@ -1,0 +1,84 @@
+import { Meta } from '@storybook/blocks';
+ 
+import * as FileExplorerStories from './FileExplorer.stories';
+ 
+<Meta of={FileExplorerStories} />
+ 
+# FileExplorer 
+## Features
+- Display files and directories in a hierarchical Tree format
+## Retrictiion
+- ID and names within the same directory are unique
+## Focus of this component
+- Functionality instead of styling
+## Test cases
+- Display in hierarchical Tree forat
+- Display names of files and directories
+- Content of direction is intended to the right.
+- Click Dictionary can toggle its expanded and collapsed state.
+- Directories should appear before files
+- All items should be sorted within their respective categories
+- (optional) Style expended or collapsed state.
+- Empty directory can be rendered without placeholder.
+- File cannot be interacted with.
+## Data format
+```
+interface FileObject {
+  id: number;
+  name: string;
+  children?: FileObject[];
+}
+```
+Example data:
+```
+const fileData = [
+  {
+    id: 1,
+    name: 'README.md',
+  },
+  {
+    id: 2,
+    name: 'Documents',
+    children: [
+      {
+        id: 3,
+        name: 'Word.doc',
+      },
+      {
+        id: 4,
+        name: 'Powerpoint.ppt',
+      },
+    ],
+  },
+];
+```
+## Flow
+iterate data -> directory or file
+## Work items
+- ✅ determine if an object is a directiory or file by checking whether there's any extension. Cannot use whether there's a children property. Although extention might work in some cases, but it is likely to have false positive because there's no limitation of the directories.
+- sort content by categories(dir -> file) first then alphabetically
+- ✅ basic rendering
+- ✅ click directories to toggle content
+- add css
+## Component structure
+FileExplorer
+  Directory
+    Directory
+    File
+## State/Props
+*FileExplorer*
+prop
+data: FileObject[]
+
+*Directory*
+prop
+name
+id
+
+state
+is open
+
+*File*
+prop
+name
+id

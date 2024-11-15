@@ -135,7 +135,7 @@ const Wordle = ({ word }: WordleProps) => {
     }
 
     const renderDebug = () => {
-        return (<div>
+        return (<div style={{position: 'absolute', top: 0}}>
             <strong>Debug</strong>
             <p>Draft: {draft}</p>
             <p>Answer: {word}</p>
@@ -146,9 +146,10 @@ const Wordle = ({ word }: WordleProps) => {
         <div className={styles.container}>
             <h1>Wordle</h1>
             {/* TODO: Separator */}
-
-            {renderGrid()}
-            {renderKeyboard()}
+            <div style={{display: 'flex', gap: '1rem', flexDirection: 'column'}}>
+                {renderGrid()}
+                {renderKeyboard()}
+            </div>
             {status && <p>Status: {status}</p>}
             {renderDebug()}
         </div>);

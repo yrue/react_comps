@@ -56,10 +56,11 @@ componentNames.forEach((componentName) => {
   fs.writeFileSync(indexPath, indexContent);
 
   // Create css module file
+  const cssExtension = 'scss';
   if (includeCss === true) {
     const cssPath = path.join(
       componentFolderPath,
-      `${componentName}.module.scss`
+      `${componentName}.module.${cssExtension}`
     );
     const cssContent = `.container{\n\n}`;
     fs.writeFileSync(cssPath, cssContent);
@@ -71,7 +72,7 @@ componentNames.forEach((componentName) => {
     `${componentName}.${extension}x`
   );
   const componentContent = `import {} from 'react';
-${includeCss ? `import styles from './${componentName}.module.css';` : ""}
+${includeCss ? `import styles from './${componentName}.module.${cssExtension}';` : ""}
 const ${componentName} = () => {
     return <div>${componentName} Component</div>;
 };

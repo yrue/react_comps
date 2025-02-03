@@ -1,0 +1,41 @@
+import { Meta, Story } from '@storybook/blocks';
+ 
+import * as StopwatchStories from './Stopwatch.stories';
+ 
+<Meta of={StopwatchStories} />
+ 
+# Stopwatch 
+
+## Requirements:
+Measure how much time has passed since the stopwatch was started.
+
+- current time : seconds, milliseconds
+- button - start or stop
+  on click
+  1. start/stop timer
+  2. update timer
+- button - reset
+  on click
+  1. reset the stopwatch to 0
+  2. stop the timer
+
+- timer formatting : 00:00:00:000
+
+## Questions for designing:
+1. How to handle the timer? Event handler or useEffect?
+2. What to determine whether it's Running or Stopped? State or Ref? Boolean or IntervalId?
+3. What to update in each interval? Add static time or calculate the difference?
+4. How to format the time?
+
+## Keys
+1. setInterval delay is not reliable
+2. Declaration, Update of React state and ref
+3. Whether to use useEffect or event handler
+
+---
+
+# Stories
+
+### Default
+<Story name="Default" />
+

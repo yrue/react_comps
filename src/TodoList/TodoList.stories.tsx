@@ -1,8 +1,12 @@
-import TodoList from ".";
+import type { Meta, StoryObj } from '@storybook/react';
 
-export default {
-    component: TodoList
-}
+import TodoList from './.';
 
-export const Default = {
-}
+const meta: Meta<typeof TodoList> = {
+    component: TodoList,
+};
+
+export default meta;
+type Story = StoryObj<typeof TodoList>;
+
+export const Basic: Story = {};

@@ -1,0 +1,30 @@
+import { Canvas, Meta, Controls } from '@storybook/blocks';
+
+import * as TodoList from './TodoList.stories'
+
+<Meta of={TodoList} />
+
+<Canvas />
+
+# Overview
+A todo list.
+
+## Features
+- Add new tasks on clicking the "Submit" button.
+- The \<input> field should be cleared upon successful addition.
+- Remove tasks from the Todo List upon clicking the "Delete" button.
+
+## Detail Design
+- what state to maintain? tasks list -> map, input value
+- type of task
+```typescript
+interface Task{
+  [id as string]: [content as string]
+}
+```
+- render task as list, using id as key in JSX
+- add new task with generated id after onclick of the submit button is trigger
+- remove task by id when clicking delete button
+
+- disable submit button if nothing is input
+- handle truncation of the input

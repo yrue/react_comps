@@ -1,29 +1,20 @@
-import {useState} from 'react';
-interface Todo {
-    id: number,
-    content: string
-}
+import { useState } from 'react';
+
 let id = 0
-const getId = () => {
+const getId = (): number => {
     id += 1;
     return id
 }
-const defaultTodos : Todo[] = [
-    {
-        id: getId(),
-        content: 'Walk the dog'
-    },
-    {
-        id: getId(),
-        content: 'Water the plants'
-    },
-    {
-        id: getId(),
-        content: 'Wash the dishes'
-    }
-]
+
+type TaskMap = Map<number, string>;
+
+const defaultTodos: TaskMap = new Map([
+    [getId(), 'Walk the dog'],
+    [getId(), 'Water the plants'],
+    [getId(), 'Wash the dishes']
+]);
 const TodoList = () => {
-    const [todos, setTodos] = useState<Todo[]>(defaultTodos)
+    const [todos, setTodos] = useState<TaskMap>(defaultTodos)
     const [newTodo, setNewTodo] = useState<string>('');
     return (
         <>
@@ -31,23 +22,28 @@ const TodoList = () => {
             <form onSubmit={(e) => {
                 e.preventDefault();
                 const formItem = new FormData(e.currentTarget);
-                const newTodo = formItem.get('todo') as string; // TODO: other approach than `as string`?
+                const newTodo = formItem.get('todo') as string;
 
-                setTodos([...todos, {id: getId(), content: newTodo}]);
+                setTodos(prevState => {
+                    prevState.set(getId(), newTodo);
+                    return new Map(prevState);
+                });
                 setNewTodo('');
             }}>
-                <input placeholder='Add your task' name='todo' value={newTodo} onChange={(e) => setNewTodo(e.target.value)}/>
+                <input placeholder='Add your task' name='todo' value={newTodo} onChange={(e) => setNewTodo(e.target.value)} />
                 <button type='submit' disabled={!newTodo}>Submit</button>
             </form>
-            {todos.length > 0 &&(
+            {todos.size > 0 && (
                 <ul>
-                    {todos.map(({id, content}) => (
-                        <>
-                            <li key={id}>{content}</li>
+                    {Array.from(todos).map(([id, content]) => (
+                        <li key={id}>{content}
                             <button onClick={() => {
-                                setTodos([...todos.filter(todo => todo.id !== id)])
+                                setTodos(prevState => {
+                                    prevState.delete(id);
+                                    return new Map(prevState);
+                                });
                             }}>Delete</button>
-                        </>
+                        </li>
                     ))}
                 </ul>
             )}

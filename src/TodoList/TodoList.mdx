@@ -1,4 +1,4 @@
-import { Canvas, Meta, Controls } from '@storybook/blocks';
+import { Canvas, Meta } from '@storybook/blocks';
 
 import * as TodoList from './TodoList.stories'
 
@@ -6,27 +6,27 @@ import * as TodoList from './TodoList.stories'
 
 <Canvas />
 
-# Overview
-A todo list.
+### Overview
+A simple to-do list.
 
-## Features
-- Add new tasks on clicking the "Submit" button.
-- The \<input> field should be cleared upon successful addition.
-- Remove tasks from the Todo List upon clicking the "Delete" button.
+### Features
+- Add tasks with the "Submit" button.
+- Clear input after task is added.
+- Delete tasks using the "Delete" button.
 
-## Detail Design
-- what state to maintain? tasks list -> map, input value
-- type of task
-```typescript
-interface Task{
-  [id as string]: [content as string]
-}
-```
-- render task as list, using id as key in JSX
-- add new task with generated id after onclick of the submit button is trigger
-- remove task by id when clicking delete button
-- accessibility: label for input (`ara-label` or `<label>`)
+### Details
+> 💡 Use `key` for list, ensure input accessibility, choose data structure for tasks
 
-Possible improvement
-- disable submit button if nothing is input
-- handle truncation of the input
+- **State to maintain**: 
+  - `tasks`: List of tasks with unique IDs and titles.
+  - `newTask`: New task title (string).
+- **Data structure for tasks**: 
+  - ✅ Use `Map` for better performance (lookup, insert, delete).
+- Render tasks with unique IDs as keys in JSX.
+- Add tasks with a generated ID after clicking submit.
+- Remove tasks by ID when clicking delete.
+- **Accessibility**: Use label for input (`aria-label` or `<label>`).
+
+### Possible Improvements
+- Disable the submit button if input is empty.
+- Handle input truncation.

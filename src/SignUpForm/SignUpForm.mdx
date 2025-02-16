@@ -1,0 +1,28 @@
+import { Meta, Canvas } from '@storybook/blocks';
+ 
+import * as SignUpFormStories from './SignUpForm.stories';
+ 
+<Meta of={SignUpFormStories} />
+ 
+<Canvas />
+
+# SignUpForm 
+
+{/* Overview */}
+
+## Features
+1. Allow to input fields with validation - username, email, password, confirm password
+2. Handle submit after clicking submit button
+
+## Details
+- state
+- validation timing - onSubmit, by API, ✅onChange(debounce): for providing smoother UX
+- show validation error inline
+- handle api request - show success or failed after submitting
+- accessibility
+  input - `aria-invalid`
+
+Improvements
+- disable submitting while waiting for API resolved
+- styles
+- enable button if all fields are valid

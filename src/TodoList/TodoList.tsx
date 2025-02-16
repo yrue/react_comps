@@ -30,7 +30,7 @@ const TodoList = () => {
                 });
                 setNewTodo('');
             }}>
-                <input placeholder='Add your task' name='todo' value={newTodo} onChange={(e) => setNewTodo(e.target.value)} />
+                <input aria-label="Add new task" placeholder='Add your task' name='todo' value={newTodo} onChange={(e) => setNewTodo(e.target.value)} />
                 <button type='submit' disabled={!newTodo}>Submit</button>
             </form>
             {todos.size > 0 && (

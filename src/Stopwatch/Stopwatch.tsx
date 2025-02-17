@@ -61,9 +61,9 @@ const Stopwatch = () => {
 
     return (
         <>
-            <div className={styles.stopwatch}>
+            <div>
                 <div>{formatTime(timestamp)}</div>
-                <div className={styles.buttons}>
+                <div>
                     <button onClick={() => toggleTimer()}>{isRunning? 'Stop' : 'Start'}</button>
                     <button onClick={() => {
                         stopTimer()

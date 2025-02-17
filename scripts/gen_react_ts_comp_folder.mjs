@@ -102,13 +102,21 @@ export const Default = {
   const storyCompName = `${componentName}Stories`;
   const mdx = {
     path: path.join(componentFolderPath, `${componentName}.mdx`),
-    content: `import { Meta } from '@storybook/blocks';
+    content: `import { Meta, Canvas } from '@storybook/blocks';
  
 import * as ${storyCompName} from './${componentName}.stories';
  
 <Meta of={${storyCompName}} />
  
-# ${componentName} `,
+<Canvas />
+
+# ${componentName} 
+
+{/* Overview */}
+
+## Features
+## Details
+`,
   };
   fs.writeFileSync(mdx.path, mdx.content);
 

@@ -6,23 +6,27 @@ import * as SignUpFormStories from './SignUpForm.stories';
  
 <Canvas />
 
-# SignUpForm 
+### SignUpForm
 
-{/* Overview */}
+#### Overview
 
 ## Features
-1. Allow to input fields with validation - username, email, password, confirm password
-2. Handle submit after clicking submit button
+1. Input fields with validation: username, email, password, and confirm password.
+2. Handle form submission when the submit button is clicked.
 
 ## Details
-- state
-- validation timing - onSubmit, by API, ✅onChange(debounce): for providing smoother UX
-- show validation error inline
-- handle api request - show success or failed after submitting
-- accessibility
-  input - `aria-invalid`
+- State management - what to render? input valid, error message. what to store? form fields data, including key, value, errors. when to update value and errors? when input change, update value and errors by field key.
+- controlled or uncontrolled input? use controlled input
+- Validation timing: onSubmit, via API, ✅ onChange (with debounce? ❌) for smoother UX.
+- Inline validation error messages.
+- Accessibility: 
+  - Input fields with `aria-describedby`.
 
-Improvements
-- disable submitting while waiting for API resolved
-- styles
-- enable button if all fields are valid
+### Improvements
+- Disable the submit button while waiting for the API response.
+- Enable the submit button only when all fields are valid.
+- Refactor the fields into smaller components for easier customization, such as styling.
+- ✅ Styles:
+  - Center content horizontally.
+  - Place the title above the label.
+  - Set content width to 200px.

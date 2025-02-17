@@ -7,11 +7,35 @@ export default {
 
 export const Default = {
     play: async ({ canvasElement }) => {
-        /*
-        1. Render fields
-        2. Show invalid error when input invalid value for each fields
-        3. click submit to call API
-        4. handle API response
-        */
+        // 1. Render fields
+        expect(canvasElement).toHaveTextContent('Username');
+        expect(canvasElement).toHaveTextContent('Email');
+        expect(canvasElement).toHaveTextContent('Password');
+        expect(canvasElement).toHaveTextContent('Confirm Password');
+
+        // 2. Show invalid error when input invalid value for each fields
+        const usernameInput = within(canvasElement).getByRole('textbox', { name: /username/i });
+        await userEvent.type(usernameInput, 'a');
+        expect(canvasElement).toHaveTextContent('Minimal of 4 characters.');
+
+        const emailInput = within(canvasElement).getByRole('textbox', { name: /email/i });
+        await userEvent.type(emailInput, 'invalidemail');
+        expect(canvasElement).toHaveTextContent('Invalid email address.');
+
+        const passwordInput = within(canvasElement).getByRole('textbox', { name: /password/i });
+        await userEvent.type(passwordInput, 'short');
+        expect(canvasElement).toHaveTextContent('Minimal of 6 characters.');
+
+        const passwordConfirmInput = within(canvasElement).getByRole('textbox', { name: /confirm password/i });
+        await userEvent.type(passwordConfirmInput, 'mismatch');
+        expect(canvasElement).toHaveTextContent('Passwords do not match.');
+
+        // 3. click submit to call API
+        const submitButton = within(canvasElement).getByRole('button', { name: /submit/i });
+        await userEvent.click(submitButton);
+
+        // 4. handle API response
+        // This part is not directly testable in Storybook, as it involves an external API call.
+        // It should be tested in a unit test or integration test.
     }
 }

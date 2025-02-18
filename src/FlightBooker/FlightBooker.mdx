@@ -11,7 +11,7 @@ Here's a rephrased version of your content:
 ---
 
 # FlightBooker
-> 💡 form, select, date input, vitest
+> 💡 form, select, date input(`min` attribute), vitest
 
 A component that enables booking flights, offering both one-way and return options for specified dates.
 
@@ -65,15 +65,16 @@ A component that enables booking flights, offering both one-way and return optio
   - **Valid:** A boolean flag indicating validity.
   - **Booked Flight:** Initially empty (`''`), then updated with the selected date or dates.
 
-- **Handling Option Switching:**  
-  - **Simple Approach:** Reset the state when switching between flight options.
-  - **Complex Approach:** Retain the previous state when switching options.
+- **Handling Option Switching:** ⚠️ Use simple one as the UX is not smooth with the complex one.
+  - **Simple Approach:** Hide or Show the arrive date when switching between flight options.
+  - ✅ **Complex Approach:** Retain the previous state when switching options. 
 
 - **State Management:**
   - **option:** Managed as an auto-enumerated value.
   - **dateObj:** An object structured as `{ oneWay: [date], return: [date, date] }`.
 
 - **Validation:**  
+  Options: ✅onChange, onSubmit
   Validate the selected date(s) and compute an inner date variable for performance optimization (using memoization) to avoid unnecessary re-renders.
 
 - **User Interface:**
@@ -89,3 +90,4 @@ A component that enables booking flights, offering both one-way and return optio
 - Disable the submit button if the date(s) selected are invalid.
 - Enhance styling for a better user experience.
 - Test: select dates multiple times
+- Change state from single dateObj -> two states for departure and arrive date

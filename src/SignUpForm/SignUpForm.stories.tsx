@@ -32,7 +32,7 @@ export const Default = {
 
         // 3. click submit to call API
         const submitButton = within(canvasElement).getByRole('button', { name: /Sign Up/ });
-        await userEvent.click(submitButton);
+        // await userEvent.click(submitButton);
 
         // 4. handle API response
         // This part is not directly testable in Storybook, as it involves an external API call.

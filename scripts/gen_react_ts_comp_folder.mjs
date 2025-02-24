@@ -102,10 +102,11 @@ export const Default = {
   const storyCompName = `${componentName}Stories`;
   const mdx = {
     path: path.join(componentFolderPath, `${componentName}.mdx`),
-    content: `import { Canvas } from '@storybook/blocks';
+    content: `import { Canvas, Meta } from '@storybook/blocks';
  
 import * as ${storyCompName} from './${componentName}.stories';
  
+<Meta of={${componentName}}>
 <Canvas />
 
 # ${componentName} 

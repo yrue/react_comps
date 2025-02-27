@@ -106,7 +106,7 @@ export const Default = {
  
 import * as ${storyCompName} from './${componentName}.stories';
  
-<Meta of={${componentName}}>
+<Meta of={${componentName}} />
 <Canvas />
 
 # ${componentName} 

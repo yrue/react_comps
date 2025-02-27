@@ -108,8 +108,8 @@ const JobBoard_v2 = () => {
     return (
         <div className={styles.container}>
             <h1 className={styles.header}>Hacker News Job Board</h1>
-            {jobs.length && <JobList jobs={jobs} />}
-            {isLoading ? 'Loading...' : (
+            {jobs.length > 0 && <JobList jobs={jobs} />}
+            {isLoading ? <div>'Loading...'</div> : (
                 <button className={styles.btn} disabled={jobs.length === jobIds.length} onClick={() => {
                     loadBatchJobs(jobIds)
                 }}>Load more jobs</button>

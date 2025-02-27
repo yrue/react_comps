@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeAll, afterEach, afterAll, beforeEach } from 'vitest';
 
 import { render, screen, waitFor } from '@testing-library/react';
-import JobBoard from './JobBoard_v2'; // Adjust the import based on your actual component path
+import JobBoard from './JobBoard'; // Adjust the import based on your actual component path
 
 import { setupServer } from 'msw/node';
 import { handlers } from './handlers'; // Adjust the path as necessary

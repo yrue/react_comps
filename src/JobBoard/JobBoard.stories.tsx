@@ -1,4 +1,4 @@
-import JobBoard from "./JobBoard.tsx";
+import JobBoard from ".";
 
 export default {
     component: JobBoard

@@ -1,110 +1,121 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import styles from './JobBoard.module.scss';
 
-// TODO:
-// Improvement
-// on load button click -> call API to fetch event based on current job size + 1
-// so that no need `page` state and useEffect
+type JobIds = string[]
 
 interface Job {
-  id: string, title: string, time: string, by: string, url?: string
-}
-const JobPosting = ({ title, by, time, url }: Omit<Job, 'id'>) => {
-  return (
-    <>
-      {url ? <a href={url}>{title}</a> : <div>{title}</div>}
-      <>
-        By {by}
-      </>
-      {time}
-    </>
-  )
+    id: number;
+    title: string;
+    by: string;
+    time: number;
+    url?: string;
 }
 
-const PAGE_SIZE = 6;
+
+// in other files
+const Job: React.FC<Pick<Job, 'title' | 'by' | 'time'> & Partial<Pick<Job, 'url'>>> = ({ title, by, time, url }) => {
+    const formattedDate = new Date(time * 1000).toISOString()
+    return (
+        <article className={styles.job}>
+            {/* TODO: extract as a comp? */}
+            {url ? <a href={url} className={styles.title}>{title}</a> : <div className={styles.title}>{title}</div>}
+            {/* TODO: does it make sense to call it footer? */}
+            <footer className={styles.footer}>
+                <div>By <span className={styles.poster}>{by}</span></div>
+                <div>{formattedDate}</div>
+            </footer>
+        </article>
+    )
+}
+const JobList: React.FC<{ jobs: Job[] }> = ({ jobs }) => {
+    return (
+        <div className={styles.jobList}>
+            {jobs.map(job => <Job key={job.id} {...job} />)}
+        </div>
+    )
+}
+
+// api services
+const jobApiService = async (url: string) => {
+    try {
+        const resp = await fetch(url, {
+            method: 'GET',  // or 'POST', 'PUT', etc.
+            headers: {
+                'Content-Type': 'application/json',  // Define the content type
+                'Cache-Control': 'max-age=86400',    // Cache for 1 day (86400 seconds)
+                'Accept': 'application/json'         // Specify accepted response format
+            }
+        })
+        return resp.json()
+    } catch (error) {
+        console.error('Error fetching job ids:', error);
+    }
+}
+
+const GET_JOB_API = `https://hacker-news.firebaseio.com/v0/item/{id}.json`; // TS string formatting?
+const GET_JOBS_API = `https://hacker-news.firebaseio.com/v0/jobstories.json`
+const LOAD_BATCH_SIZE = 6
 
 const JobBoard = () => {
-  // api call : stories -{id}-> detail(title, poster, date, link?)
-  // 1. fetch stories
-  // 2. fetch id
-  const [fetchingJobDetails, setFetchingJobDetails] =
-    useState(false);
-  const [jobIds, setJobIds] = useState<string[] | null>(null);
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [page, setPage] = useState<number>(0);
+    const [jobs, setJobs] = useState<Job[]>([])
+    const [page, setPage] = useState<number>(0)
+    const [jobIds, setJobIds] = useState<JobIds>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const isMounted = useRef(true);
 
-  useEffect(() => {
-    fetchJobs(page);
-  }, [page]);
 
-  async function fetchJobIds(currPage: number) {
-    let jobs = jobIds;
-    if (!jobs) {
-      const res = await fetch(
-        'https://hacker-news.firebaseio.com/v0/jobstories.json',
-      );
-      jobs = await res.json();
-      setJobIds(jobs);
+    const loadBatchJobs = async (jobIds: JobIds) => {
+        setIsLoading(true);
+        const promises = []
+        let index = page * LOAD_BATCH_SIZE;
+        const end = index + LOAD_BATCH_SIZE;
+        for (index; index < end; index++) {
+            if (index == jobIds.length) {
+                break;
+            }
+            promises.push(jobApiService(GET_JOB_API.replace('{id}', jobIds[index])))
+        }
+        const curr = await Promise.all(promises);
+        if (!isMounted.current) return;
+        setPage(prev => prev + 1)
+        setJobs(prev => [...prev, ...curr])
+        setIsLoading(false);
     }
 
-    const start = currPage * PAGE_SIZE;
-    const end = start + PAGE_SIZE;
-    return jobs.slice(start, end) as string[];
-  }
+    // load job ids and initial job when initializing
+    useEffect(() => {
+        isMounted.current = true;
 
-  async function fetchJobs(currPage: number) {
-    const jobIdsForPage = await fetchJobIds(currPage);
+        (async function () {
+            const ids = await jobApiService(GET_JOBS_API)
+            if (!ids) return;
 
-    setFetchingJobDetails(true);
-    const jobsForPage = await Promise.all(
-      jobIdsForPage.map((jobId) =>
-        fetch(
-          `https://hacker-news.firebaseio.com/v0/item/${jobId}.json`,
-        ).then((res) => res.json()),
-      ),
-    );
-    setJobs([...jobs, ...jobsForPage]);
+            if (!isMounted.current) return;
 
-    setFetchingJobDetails(false);
-  }
+            await loadBatchJobs(ids);
+            setJobIds(ids);
+        })();
 
+        // Indicate that the component is unmounted, so
+        // that requests that complete after the component
+        // is unmounted don't cause a "setState on an unmounted
+        // component error".
+        return () => {
+            isMounted.current = false;
+        }
+    }, [])
 
-  // fetch 6 poster by default
-
-  // click button to load 6 more list
-  // hide button if no more job
-
-  // render job with title, poster(by), time, link?
-  return (
-    <div>
-      <h1>Hacker News Jobs Board</h1>
-      {jobIds == null ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          <ul>
-            {jobs.map((job) => (
-              <li key={job.id}>
-                <JobPosting  {...job} />
-              </li>
-            ))}
-          </ul>
-          {jobs.length > 0 &&
-            page * PAGE_SIZE + PAGE_SIZE <
-            jobIds.length && (
-              <button
-                className="load-more-button"
-                disabled={fetchingJobDetails}
-                onClick={() => setPage(page + 1)}>
-                {fetchingJobDetails
-                  ? 'Loading...'
-                  : 'Load more jobs'}
-              </button>
+    return (
+        <div className={styles.container}>
+            <h1 className={styles.header}>Hacker News Job Board</h1>
+            {jobs.length > 0 && <JobList jobs={jobs} />}
+            {isLoading ? <div>Loading...</div> : (
+                <button className={styles.btn} disabled={jobs.length === jobIds.length} onClick={() => {
+                    loadBatchJobs(jobIds)
+                }}>Load more jobs</button>
             )}
-        </>
-
-      )}
-    </div>
-  );
+        </div>
+    );
 };
 
 export default JobBoard;

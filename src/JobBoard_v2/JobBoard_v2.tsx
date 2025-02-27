@@ -63,13 +63,13 @@ const JobBoard_v2 = () => {
 
     const loadBatchJobs = async (jobIds: JobIds) => {
         const promises = []
-        let start = page * LOAD_BATCH_SIZE;
-        const end = start + LOAD_BATCH_SIZE;
-        for (start; start < end; start++) {
-            if (start == jobIds.length) {
+        let index = page * LOAD_BATCH_SIZE;
+        const end = index + LOAD_BATCH_SIZE;
+        for (index; index < end; index++) {
+            if (index == jobIds.length) {
                 break;
             }
-            promises.push(await jobApiService(GET_JOB_API.replace('{id}', jobIds[start])))
+            promises.push(jobApiService(GET_JOB_API.replace('{id}', jobIds[index])))
         }
         const result = await Promise.all(promises);
         setPage(prev => prev + 1)

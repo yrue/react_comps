@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import styles from './JobBoard_v2.module.scss';
 
 type JobIds = string[]
@@ -48,7 +48,7 @@ const jobApiService = async (url: string) => {
         })
         return resp.json()
     } catch (error) {
-        console.error(error)
+        console.error('Error fetching job ids:', error);
     }
 }
 
@@ -60,8 +60,12 @@ const JobBoard_v2 = () => {
     const [jobs, setJobs] = useState<Job[]>([])
     const [page, setPage] = useState<number>(0)
     const [jobIds, setJobIds] = useState<JobIds>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const isMounted = useRef(true);
+
 
     const loadBatchJobs = async (jobIds: JobIds) => {
+        setIsLoading(true);
         const promises = []
         let index = page * LOAD_BATCH_SIZE;
         const end = index + LOAD_BATCH_SIZE;
@@ -71,28 +75,45 @@ const JobBoard_v2 = () => {
             }
             promises.push(jobApiService(GET_JOB_API.replace('{id}', jobIds[index])))
         }
-        const result = await Promise.all(promises);
+        const curr = await Promise.all(promises);
+        if (!isMounted.current) return;
         setPage(prev => prev + 1)
-        setJobs(prev => prev.concat(result))
+        setJobs(prev => [...prev, ...curr])
+        setIsLoading(false);
     }
 
     // load job ids and initial job when initializing
     useEffect(() => {
+        isMounted.current = true;
+
         (async function () {
             const ids = await jobApiService(GET_JOBS_API)
-            if (ids) setJobIds(ids);
+            if (!ids) return;
+    
+            if (!isMounted.current) return;
 
             await loadBatchJobs(ids);
+            setJobIds(ids);
         })();
+
+        // Indicate that the component is unmounted, so
+        // that requests that complete after the component
+        // is unmounted don't cause a "setState on an unmounted
+        // component error".
+        return () => {
+            isMounted.current = false;
+        }
     }, [])
 
     return (
         <div className={styles.container}>
             <h1 className={styles.header}>Hacker News Job Board</h1>
-            <JobList jobs={jobs} />
-            <button className={styles.btn} disabled={jobs.length === jobIds.length} onClick={async () => {
-                await loadBatchJobs(jobIds)
-            }}>Load more jobs</button>
+            {jobs.length && <JobList jobs={jobs} />}
+            {isLoading ? 'Loading...' : (
+                <button className={styles.btn} disabled={jobs.length === jobIds.length} onClick={() => {
+                    loadBatchJobs(jobIds)
+                }}>Load more jobs</button>
+            )}
         </div>
     );
 };

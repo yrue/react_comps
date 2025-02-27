@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './JobBoard_v2.module.scss';
 
 type JobIds = string[]
@@ -58,30 +58,31 @@ const LOAD_BATCH_SIZE = 6
 
 const JobBoard_v2 = () => {
     const [jobs, setJobs] = useState<Job[]>([])
-    const nextIndexRef = useRef(0) // should be state?
-    const jobIdsRef = useRef<JobIds>([])
+    const [page, setPage] = useState<number>(0)
+    const [jobIds, setJobIds] = useState<JobIds>([]);
 
     const loadBatchJobs = async (jobIds: JobIds) => {
         const promises = []
-        let index;
-        for (index = nextIndexRef.current; index < nextIndexRef.current + LOAD_BATCH_SIZE; index++) {
-            if (index == jobIds.length) {
+        let start = page * LOAD_BATCH_SIZE;
+        const end = start + LOAD_BATCH_SIZE;
+        for (start; start < end; start++) {
+            if (start == jobIds.length) {
                 break;
             }
-            promises.push(await jobApiService(GET_JOB_API.replace('{id}', jobIds[index])))
+            promises.push(await jobApiService(GET_JOB_API.replace('{id}', jobIds[start])))
         }
         const result = await Promise.all(promises);
-        nextIndexRef.current += 6
+        setPage(prev => prev + 1)
         setJobs(prev => prev.concat(result))
     }
 
     // load job ids and initial job when initializing
     useEffect(() => {
         (async function () {
-            const jobIds = await jobApiService(GET_JOBS_API)
-            jobIdsRef.current = jobIds;
+            const ids = await jobApiService(GET_JOBS_API)
+            if (ids) setJobIds(ids);
 
-            await loadBatchJobs(jobIds);
+            await loadBatchJobs(ids);
         })();
     }, [])
 
@@ -89,8 +90,8 @@ const JobBoard_v2 = () => {
         <div className={styles.container}>
             <h1 className={styles.header}>Hacker News Job Board</h1>
             <JobList jobs={jobs} />
-            <button className={styles.btn} disabled={jobs.length === jobIdsRef.current.length} onClick={async () => {
-                await loadBatchJobs(jobIdsRef.current)
+            <button className={styles.btn} disabled={jobs.length === jobIds.length} onClick={async () => {
+                await loadBatchJobs(jobIds)
             }}>Load more jobs</button>
         </div>
     );

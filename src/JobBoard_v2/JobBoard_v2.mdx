@@ -1,0 +1,76 @@
+import { Canvas, Meta } from '@storybook/blocks';
+import * as JobBoard_v2 from './JobBoard_v2.stories';
+ 
+<Meta of={JobBoard_v2} />
+<Canvas />
+
+# JobBoard_v2 
+> 💡 API, batch load, vitest, msw
+{/* Overview */}
+
+## Features
+
+- **Job List**:
+  - Display an initial set of 6 jobs (k = 6).
+  - Clicking the "Load More" button loads 6 additional posts.
+  
+- **Load More**:
+  - The "Load More" button is disabled if there are no more jobs to load.
+  
+- **Job Title**:
+  - Attach a URL to the job title if one exists.
+
+- **Date Formatting**:
+  - Format the post date for display.
+
+---
+
+## Details
+
+### UI Structure
+```
+JobBoard
+  └─ JobList
+        └─ Job
+              ├─ title
+              ├─ poster
+              └─ post date
+  └─ Load more button
+```
+
+### API Calls
+
+1. **Fetching Job IDs**:  
+   Use `GET https://hacker-news.firebaseio.com/v0/jobstories.json` to retrieve a list of job IDs in JSON format.  
+   ```json
+   type Jobs = number[]
+   ```
+
+2. **Fetching Job Details**:  
+   Use `GET https://hacker-news.firebaseio.com/v0/item/\{id\}.json` to get details for each job post. The response will be in the following format:  
+   ```json
+   interface Job {
+     by: string,
+     id: number,
+     score: number,
+     time: number,
+     title: string,
+     type: string,
+     url?: string // Confirm if this is a required field
+   }
+   ```
+
+### Fetching Logic
+
+- **Indexing**:
+  - Initialize `index = 0`.
+  - On each "Load More" action, fetch jobs from the current index to `min(index + 6, len(jobs) - 1)` and update `index` to `end + 1`.
+
+- **Disable "Load More"**:
+  - The "Load More" button will be disabled when `index === len(jobs)` (i.e., when all jobs have been loaded).
+
+- **Rendering**:
+  - If a job has a URL, render the title as a clickable link.
+
+- **Date Formatting**:
+  - Format the datetime of each job post for display.

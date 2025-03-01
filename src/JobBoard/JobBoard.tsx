@@ -11,15 +11,17 @@ interface Job {
     url?: string;
 }
 
-
 // in other files
-const Job: React.FC<Pick<Job, 'title' | 'by' | 'time'> & Partial<Pick<Job, 'url'>>> = ({ title, by, time, url }) => {
+type JobProps = Pick<Job, 'title' | 'by' | 'time'> & { url?: Job['url'] };
+const Job: React.FC<JobProps> = ({ title, by, time, url }) => {
     const formattedDate = new Date(time * 1000).toISOString()
+    const sharedTitleProps = {
+        className: styles.title,
+        children: title
+    }   
     return (
         <article className={styles.job}>
-            {/* TODO: extract as a comp? */}
-            {url ? <a href={url} className={styles.title}>{title}</a> : <div className={styles.title}>{title}</div>}
-            {/* TODO: does it make sense to call it footer? */}
+            {url ? <a href={url} {...sharedTitleProps} /> : <div {...sharedTitleProps} />}
             <footer className={styles.footer}>
                 <div>By <span className={styles.poster}>{by}</span></div>
                 <div>{formattedDate}</div>
@@ -27,16 +29,19 @@ const Job: React.FC<Pick<Job, 'title' | 'by' | 'time'> & Partial<Pick<Job, 'url'
         </article>
     )
 }
-const JobList: React.FC<{ jobs: Job[] }> = ({ jobs }) => {
+
+type JobListProps = { jobs: Job[] }
+const JobList: React.FC<JobListProps> = ({ jobs }) => {
+
     return (
         <div className={styles.jobList}>
             {jobs.map(job => <Job key={job.id} {...job} />)}
+            {jobs.length === 0 && <p>No data.</p>}
         </div>
     )
 }
 
-// api services
-const jobApiService = async (url: string) => {
+const apiService = async (url: string) : Promise<any> => {
     try {
         const resp = await fetch(url, {
             method: 'GET',  // or 'POST', 'PUT', etc.
@@ -49,15 +54,16 @@ const jobApiService = async (url: string) => {
         return resp.json()
     } catch (error) {
         console.error('Error fetching job ids:', error);
+        // TODO: handle error properly on UI
     }
 }
+const getJobIds = () => apiService('https://hacker-news.firebaseio.com/v0/jobstories.json')
+const getJob = (id: string) => apiService('https://hacker-news.firebaseio.com/v0/item/{id}.json'.replace('{id}', id))
 
-const GET_JOB_API = `https://hacker-news.firebaseio.com/v0/item/{id}.json`; // TS string formatting?
-const GET_JOBS_API = `https://hacker-news.firebaseio.com/v0/jobstories.json`
 const LOAD_BATCH_SIZE = 6
 
 const JobBoard = () => {
-    const [jobs, setJobs] = useState<Job[]>([])
+    const [jobs, setJobs] = useState<Job[]>([]) 
     const [page, setPage] = useState<number>(0)
     const [jobIds, setJobIds] = useState<JobIds>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -73,12 +79,12 @@ const JobBoard = () => {
             if (index == jobIds.length) {
                 break;
             }
-            promises.push(jobApiService(GET_JOB_API.replace('{id}', jobIds[index])))
+            promises.push(getJob(jobIds[index]))
         }
         const curr = await Promise.all(promises);
         if (!isMounted.current) return;
         setPage(prev => prev + 1)
-        setJobs(prev => [...prev, ...curr])
+        setJobs(prev => [...prev, ...curr.filter(job => !!job)])
         setIsLoading(false);
     }
 
@@ -87,7 +93,7 @@ const JobBoard = () => {
         isMounted.current = true;
 
         (async function () {
-            const ids = await jobApiService(GET_JOBS_API)
+            const ids = await getJobIds();
             if (!ids) return;
 
             if (!isMounted.current) return;
@@ -108,7 +114,7 @@ const JobBoard = () => {
     return (
         <div className={styles.container}>
             <h1 className={styles.header}>Hacker News Job Board</h1>
-            {jobs.length > 0 && <JobList jobs={jobs} />}
+            {!isLoading && <JobList jobs={jobs} />}
             {isLoading ? <div>Loading...</div> : (
                 <button className={styles.btn} disabled={jobs.length === jobIds.length} onClick={() => {
                     loadBatchJobs(jobIds)
